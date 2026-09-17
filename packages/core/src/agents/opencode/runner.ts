@@ -98,7 +98,7 @@ export function createOpencodeRunner(
     // and re-check the parser. See ./parser.ts. Must stay >= 1.17.0: earlier
     // CLIs don't await the run event loop (opencode #31389) and intermittently
     // exit 0 mid-step, ending runs with no final report.
-    defaultCliVersion: '1.18.5',
+    defaultCliVersion: '1.18.31',
     defaultModel: DEFAULT_OPENCODE_MODEL,
 
     async install(sandbox, version) {
@@ -113,17 +113,15 @@ export function createOpencodeRunner(
       sandbox,
       model,
       apiKey,
-      systemPromptPath,
       userPromptPath,
       mcpServers,
       timeoutSec,
     }) {
       const opencode = npmGlobalBin('opencode');
 
-      // opencode has no system-prompt flag, so prepend the system prompt to the
-      // task; both are staged files, joined via command substitution into the
-      // single message argument.
-      const message = `"$(cat ${systemPromptPath}; printf '\\n\\n'; cat ${userPromptPath})"`;
+      // The staged task file, read via command substitution into the single
+      // message argument.
+      const message = `"$(cat ${userPromptPath})"`;
 
       await sandbox.exec(`mkdir -p ${SCRATCH}`);
       await writeSandboxFile(
